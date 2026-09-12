@@ -6,9 +6,9 @@ int main() {
     // Probar MD5
     unsigned char md5[MD5_DIGEST_LENGTH];
     char hex[33];
-    if (compute_md5("main.c", md5) == 0) {
+    if (compute_md5("src/main.c", md5) == 0) {
         md5_to_hex(md5, hex);
-        printf("MD5 de main.c: %s\n", hex);
+        printf("MD5 de src/main.c: %s\n", hex);
     } else {
         printf("No se pudo calcular MD5\n");
     }
