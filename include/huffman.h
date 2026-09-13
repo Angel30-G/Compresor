@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Nodo del árbol de Huffman
+// Nodo del arbol de Huffman
 typedef struct Node {
     unsigned char symbol;
     int frequency;
@@ -13,7 +13,7 @@ typedef struct Node {
     struct Node *right;
 } Node;
 
-// Cola de prioridad (min-heap) para construir el árbol
+// Cola de prioridad (min-heap) para construir el arbol
 typedef struct {
     Node **array;
     int size;
@@ -26,19 +26,22 @@ void insert_node(MinHeap *heap, Node *node);
 Node* extract_min(MinHeap *heap);
 void free_heap(MinHeap *heap);
 
-// Construcción del árbol de Huffman a partir de las frecuencias
+// Contar frecuencias de los bytes de un archivo
+int count_frequencies(const char *input_path, unsigned long *freq, unsigned long long *total_bytes);
+
+// Construccion del arbol de Huffman a partir de las frecuencias
 Node* build_huffman_tree(unsigned long *freq);
 
-// Generación de códigos (recorrido recursivo)
+// Generacion de codigos (recorrido recursivo)
 void generate_codes(Node *root, char **codes, char *buffer, int depth);
 
-// Liberar el árbol
+// Liberar el arbol
 void free_tree(Node *root);
 
-// Función para comprimir un archivo (prototipo)
+// Funcion para comprimir un archivo (prototipo)
 int compress_file(const char *input_path, const char *output_path, const unsigned char *md5_original, long long *compressed_size);
 
-// Función para descomprimir (prototipo)
+// Funcion para descomprimir (prototipo)
 int decompress_file(const char *input_path, const char *output_path, unsigned char *md5_expected);
 
 #endif

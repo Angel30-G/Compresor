@@ -1,0 +1,41 @@
+# Archivos compilados
+*.o
+*.a
+*.so
+*.out
+
+# Ejecutables
+bin/*
+
+# Mantener carpeta bin
+!bin/.gitkeep
+
+# Datos de prueba
+data/originales/*
+data/comprimidos/*
+data/descomprimidos/*
+
+# Mantener directorios
+!data/originales/.gitkeep
+!data/comprimidos/.gitkeep
+!data/descomprimidos/.gitkeep
+
+# Resultados generados
+results/*.csv
+results/*.txt
+results/*.log
+
+# Debug
+core
+core.*
+valgrind*.log
+
+# Editores
+*.swp
+*~
+.vscode/
+.idea/
+
+# Sistema
+.DS_Store
+Thumbs.db

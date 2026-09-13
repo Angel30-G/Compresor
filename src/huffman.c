@@ -1,5 +1,39 @@
 #include "huffman.h"
 
+int count_frequencies(const char *input_path, unsigned long *freq, unsigned long long *total_bytes) {
+    FILE *file = fopen(input_path, "rb");
+
+    if (!file) {
+        return -1;
+    }
+
+    for (int i = 0; i < 256; i++) {
+        freq[i] = 0;
+    }
+
+    *total_bytes = 0;
+
+    unsigned char buffer[8192];
+    size_t bytes_read;
+
+    while ((bytes_read = fread(buffer, 1, sizeof(buffer), file)) > 0) {
+        for (size_t i = 0; i < bytes_read; i++) {
+            freq[buffer[i]]++;
+        }
+
+        *total_bytes += bytes_read;
+    }
+
+    if (ferror(file)) {
+        fclose(file);
+        return -1;
+    }
+
+    fclose(file);
+
+    return 0;
+}
+
 MinHeap* create_min_heap(int capacity) {
     MinHeap *heap = (MinHeap*)malloc(sizeof(MinHeap));
     heap->array = (Node**)malloc(capacity * sizeof(Node*));
@@ -101,3 +135,4 @@ void free_tree(Node *root) {
     free_tree(root->right);
     free(root);
 }
+
