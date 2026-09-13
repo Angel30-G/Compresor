@@ -8,7 +8,7 @@
 // Nodo del arbol de Huffman
 typedef struct Node {
     unsigned char symbol;
-    int frequency;
+    unsigned long frequency;
     struct Node *left;
     struct Node *right;
 } Node;
@@ -22,26 +22,58 @@ typedef struct {
 
 // Funciones de la cola de prioridad
 MinHeap* create_min_heap(int capacity);
-void insert_node(MinHeap *heap, Node *node);
-Node* extract_min(MinHeap *heap);
-void free_heap(MinHeap *heap);
+
+void insert_node(
+    MinHeap *heap,
+    Node *node
+);
+
+Node* extract_min(
+    MinHeap *heap
+);
+
+void free_heap(
+    MinHeap *heap
+);
 
 // Contar frecuencias de los bytes de un archivo
-int count_frequencies(const char *input_path, unsigned long *freq, unsigned long long *total_bytes);
+int count_frequencies(
+    const char *input_path,
+    unsigned long *freq,
+    unsigned long long *total_bytes
+);
 
-// Construccion del arbol de Huffman a partir de las frecuencias
-Node* build_huffman_tree(unsigned long *freq);
+// Construccion del arbol de Huffman
+Node* build_huffman_tree(
+    unsigned long *freq
+);
 
-// Generacion de codigos (recorrido recursivo)
-void generate_codes(Node *root, char **codes, char *buffer, int depth);
+// Generacion de codigos Huffman
+void generate_codes(
+    Node *root,
+    char **codes,
+    char *buffer,
+    int depth
+);
 
-// Liberar el arbol
-void free_tree(Node *root);
+// Liberar el arbol Huffman
+void free_tree(
+    Node *root
+);
 
-// Funcion para comprimir un archivo (prototipo)
-int compress_file(const char *input_path, const char *output_path, const unsigned char *md5_original, long long *compressed_size);
+// Comprimir un archivo
+int compress_file(
+    const char *input_path,
+    const char *output_path,
+    const unsigned char *md5_original,
+    long long *compressed_size
+);
 
-// Funcion para descomprimir (prototipo)
-int decompress_file(const char *input_path, const char *output_path, unsigned char *md5_expected);
+// Descomprimir un archivo
+int decompress_file(
+    const char *input_path,
+    const char *output_path,
+    unsigned char *md5_expected
+);
 
 #endif
