@@ -1,3 +1,4 @@
+#include "directory_utils.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -96,7 +97,56 @@ int run_test(const TestFile *test) {
     return 0;
 }
 
-int main(void) {
+int main(int argc, char *argv[]) {
+    /*
+     * Modo de compresion de directorio.
+     *
+     * Ejemplo:
+     * ./bin/compresor compress-dir data/originales data/comprimidos
+     */
+    if (
+        argc == 4 &&
+        strcmp(argv[1], "compress-dir") == 0
+    ) {
+        return compress_directory(
+            argv[2],
+            argv[3]
+        ) == 0 ? 0 : 1;
+    }
+
+    /*
+     * Modo de descompresion de directorio.
+     *
+     * Ejemplo:
+     * ./bin/compresor decompress-dir data/comprimidos data/descomprimidos
+     */
+    if (
+        argc == 4 &&
+        strcmp(argv[1], "decompress-dir") == 0
+    ) {
+        return decompress_directory(
+            argv[2],
+            argv[3]
+        ) == 0 ? 0 : 1;
+    }
+
+    /*
+     * Si se pasan argumentos incorrectos,
+     * mostrar ayuda.
+     */
+    if (argc != 1) {
+        printf(
+            "Uso:\n"
+            "  %s\n"
+            "  %s compress-dir <entrada> <salida>\n"
+            "  %s decompress-dir <entrada> <salida>\n",
+            argv[0],
+            argv[0],
+            argv[0]
+        );
+
+        return 1;
+    }
     TestFile tests[] = {
         {
             "Archivo vacio",
