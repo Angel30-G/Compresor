@@ -1,55 +1,113 @@
 #include <stdio.h>
+#include <string.h>
+
 #include "md5_util.h"
 #include "huffman.h"
 
-int main() {
-    // Probar MD5
-    unsigned char md5[MD5_DIGEST_LENGTH];
-    char hex[33];
-    if (compute_md5("src/main.c", md5) == 0) {
-        md5_to_hex(md5, hex);
-        printf("MD5 de src/main.c: %s\n", hex);
+int main(void) {
+    const char *original_path =
+	 "data/originales/001_2701_Moby_Dick__Or__The_Whale_by_Herman_Melville.txt";
+
+    const char *compressed_path =
+    	"data/comprimidos/moby_dick.huff";
+
+    const char *decompressed_path =
+    	"data/descomprimidos/moby_dick_recuperado.txt";
+
+    unsigned char md5_original[MD5_DIGEST_LENGTH];
+    unsigned char md5_stored[MD5_DIGEST_LENGTH];
+    unsigned char md5_decompressed[MD5_DIGEST_LENGTH];
+
+    char original_hex[33];
+    char stored_hex[33];
+    char decompressed_hex[33];
+
+    /*
+     * 1. Calcular MD5 del archivo original.
+     */
+    if (compute_md5(original_path, md5_original) != 0) {
+        fprintf(stderr, "No se pudo calcular el MD5 del archivo original.\n");
+        return 1;
+    }
+
+    md5_to_hex(md5_original, original_hex);
+
+    printf("Archivo original: %s\n", original_path);
+    printf("MD5 original: %s\n\n", original_hex);
+
+    /*
+     * 2. Comprimir.
+     */
+    long long compressed_size = 0;
+
+    if (compress_file(
+            original_path,
+            compressed_path,
+            md5_original,
+            &compressed_size
+        ) != 0) {
+
+        fprintf(stderr, "Error durante la compresión.\n");
+        return 1;
+    }
+
+    printf("Compresión finalizada correctamente.\n");
+    printf("Archivo comprimido: %s\n", compressed_path);
+    printf("Tamaño comprimido: %lld bytes\n\n", compressed_size);
+
+    /*
+     * 3. Descomprimir.
+     */
+    if (decompress_file(
+            compressed_path,
+            decompressed_path,
+            md5_stored
+        ) != 0) {
+
+        fprintf(stderr, "Error durante la descompresión.\n");
+        return 1;
+    }
+
+    printf("Descompresión finalizada correctamente.\n");
+    printf("Archivo recuperado: %s\n\n", decompressed_path);
+
+    /*
+     * 4. Calcular MD5 del archivo recuperado.
+     */
+    if (compute_md5(
+            decompressed_path,
+            md5_decompressed
+        ) != 0) {
+
+        fprintf(stderr, "No se pudo calcular el MD5 del archivo recuperado.\n");
+        return 1;
+    }
+
+    md5_to_hex(md5_stored, stored_hex);
+    md5_to_hex(md5_decompressed, decompressed_hex);
+
+    printf("MD5 almacenado:     %s\n", stored_hex);
+    printf("MD5 descomprimido: %s\n", decompressed_hex);
+
+    /*
+     * 5. Comparar ambas firmas.
+     */
+    if (memcmp(
+            md5_stored,
+            md5_decompressed,
+            MD5_DIGEST_LENGTH
+        ) == 0) {
+
+        printf("\nIntegridad: OK\n");
+        printf("El archivo descomprimido es idéntico al original.\n");
+
     } else {
-        printf("No se pudo calcular MD5\n");
+
+        printf("\nIntegridad: ERROR\n");
+        printf("Los MD5 no coinciden.\n");
+
+        return 1;
     }
 
-    // Probar Huffman: construir arbol con frecuencias de ejemplo
-    unsigned long freq[256];
-    unsigned long long total_bytes = 0;
-
-    if (count_frequencies("tests/prueba.txt", freq, &total_bytes) != 0) {
-    	printf("Error al leer el archivo de prueba\n");
-    	return 1;
-   }
-
-    printf("\nTotal de bytes: %llu\n", total_bytes);
-    printf("Frecuencias encontradas:\n");
-
-    for (int i = 0; i < 256; i++) {
-    	if (freq[i] > 0) {
-        	if (i >= 32 && i <= 126) {
-            		printf("'%c': %lu\n", i, freq[i]);
-        	} else {
-            		printf("Byte %d: %lu\n", i, freq[i]);
-        	}
-    	}
-   }
-
-    Node *root = build_huffman_tree(freq);
-    char *codes[256] = {0};
-    char buffer[256];
-    generate_codes(root, codes, buffer, 0);
-
-   for (int i = 0; i < 256; i++) {
-    if (codes[i]) {
-        if (i >= 32 && i <= 126) {
-            printf("'%c': %s\n", i, codes[i]);
-        } else {
-            printf("Byte %d: %s\n", i, codes[i]);
-        }
-
-        free(codes[i]);
-    }
-}
-
+    return 0;
 }
