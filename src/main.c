@@ -6,13 +6,13 @@
 
 int main(void) {
     const char *original_path =
-        "tests/prueba.txt";
+	 "data/originales/001_2701_Moby_Dick__Or__The_Whale_by_Herman_Melville.txt";
 
     const char *compressed_path =
-        "data/comprimidos/prueba.huff";
+    	"data/comprimidos/moby_dick.huff";
 
     const char *decompressed_path =
-        "data/descomprimidos/prueba_recuperada.txt";
+    	"data/descomprimidos/moby_dick_recuperado.txt";
 
     unsigned char md5_original[MD5_DIGEST_LENGTH];
     unsigned char md5_stored[MD5_DIGEST_LENGTH];
