@@ -4,16 +4,14 @@
 #include "md5_util.h"
 #include "huffman.h"
 
-int main(void) {
-    const char *original_path =
-	 "data/originales/001_2701_Moby_Dick__Or__The_Whale_by_Herman_Melville.txt";
+typedef struct {
+    const char *name;
+    const char *original;
+    const char *compressed;
+    const char *decompressed;
+} TestFile;
 
-    const char *compressed_path =
-    	"data/comprimidos/moby_dick.huff";
-
-    const char *decompressed_path =
-    	"data/descomprimidos/moby_dick_recuperado.txt";
-
+int run_test(const TestFile *test) {
     unsigned char md5_original[MD5_DIGEST_LENGTH];
     unsigned char md5_stored[MD5_DIGEST_LENGTH];
     unsigned char md5_decompressed[MD5_DIGEST_LENGTH];
@@ -22,65 +20,58 @@ int main(void) {
     char stored_hex[33];
     char decompressed_hex[33];
 
-    /*
-     * 1. Calcular MD5 del archivo original.
-     */
-    if (compute_md5(original_path, md5_original) != 0) {
-        fprintf(stderr, "No se pudo calcular el MD5 del archivo original.\n");
-        return 1;
+    long long compressed_size = 0;
+
+    printf("\n========================================\n");
+    printf("Prueba: %s\n", test->name);
+    printf("========================================\n");
+
+    if (compute_md5(test->original, md5_original) != 0) {
+        fprintf(stderr, "Error calculando MD5 original.\n");
+        return -1;
     }
 
     md5_to_hex(md5_original, original_hex);
 
-    printf("Archivo original: %s\n", original_path);
-    printf("MD5 original: %s\n\n", original_hex);
+    printf("Archivo original: %s\n", test->original);
+    printf("MD5 original: %s\n", original_hex);
 
-    /*
-     * 2. Comprimir.
-     */
-    long long compressed_size = 0;
-
-    if (compress_file(
-            original_path,
-            compressed_path,
+    if (
+        compress_file(
+            test->original,
+            test->compressed,
             md5_original,
             &compressed_size
-        ) != 0) {
-
-        fprintf(stderr, "Error durante la compresión.\n");
-        return 1;
+        ) != 0
+    ) {
+        fprintf(stderr, "Error durante la compresion.\n");
+        return -1;
     }
 
-    printf("Compresión finalizada correctamente.\n");
-    printf("Archivo comprimido: %s\n", compressed_path);
-    printf("Tamaño comprimido: %lld bytes\n\n", compressed_size);
+    printf("Compresion: OK\n");
+    printf("Tamano comprimido: %lld bytes\n", compressed_size);
 
-    /*
-     * 3. Descomprimir.
-     */
-    if (decompress_file(
-            compressed_path,
-            decompressed_path,
+    if (
+        decompress_file(
+            test->compressed,
+            test->decompressed,
             md5_stored
-        ) != 0) {
-
-        fprintf(stderr, "Error durante la descompresión.\n");
-        return 1;
+        ) != 0
+    ) {
+        fprintf(stderr, "Error durante la descompresion.\n");
+        return -1;
     }
 
-    printf("Descompresión finalizada correctamente.\n");
-    printf("Archivo recuperado: %s\n\n", decompressed_path);
+    printf("Descompresion: OK\n");
 
-    /*
-     * 4. Calcular MD5 del archivo recuperado.
-     */
-    if (compute_md5(
-            decompressed_path,
+    if (
+        compute_md5(
+            test->decompressed,
             md5_decompressed
-        ) != 0) {
-
-        fprintf(stderr, "No se pudo calcular el MD5 del archivo recuperado.\n");
-        return 1;
+        ) != 0
+    ) {
+        fprintf(stderr, "Error calculando MD5 descomprimido.\n");
+        return -1;
     }
 
     md5_to_hex(md5_stored, stored_hex);
@@ -89,25 +80,82 @@ int main(void) {
     printf("MD5 almacenado:     %s\n", stored_hex);
     printf("MD5 descomprimido: %s\n", decompressed_hex);
 
-    /*
-     * 5. Comparar ambas firmas.
-     */
-    if (memcmp(
+    if (
+        memcmp(
             md5_stored,
             md5_decompressed,
             MD5_DIGEST_LENGTH
-        ) == 0) {
-
-        printf("\nIntegridad: OK\n");
-        printf("El archivo descomprimido es idéntico al original.\n");
-
-    } else {
-
-        printf("\nIntegridad: ERROR\n");
-        printf("Los MD5 no coinciden.\n");
-
-        return 1;
+        ) != 0
+    ) {
+        printf("Integridad: ERROR\n");
+        return -1;
     }
 
+    printf("Integridad: OK\n");
+
     return 0;
+}
+
+int main(void) {
+    TestFile tests[] = {
+        {
+            "Archivo vacio",
+            "tests/vacio.txt",
+            "data/comprimidos/vacio.huff",
+            "data/descomprimidos/vacio.txt"
+        },
+        {
+            "Un solo simbolo",
+            "tests/un_simbolo.txt",
+            "data/comprimidos/un_simbolo.huff",
+            "data/descomprimidos/un_simbolo.txt"
+        },
+        {
+            "Archivo normal",
+            "tests/normal.txt",
+            "data/comprimidos/normal.huff",
+            "data/descomprimidos/normal.txt"
+        },
+        {
+            "Archivo de prueba original",
+            "tests/prueba.txt",
+            "data/comprimidos/prueba.huff",
+            "data/descomprimidos/prueba.txt"
+        },
+        {
+            "Moby Dick",
+            "data/originales/001_2701_Moby_Dick__Or__The_Whale_by_Herman_Melville.txt",
+            "data/comprimidos/moby_dick.huff",
+            "data/descomprimidos/moby_dick.txt"
+        }
+    };
+
+    int total_tests =
+        sizeof(tests) / sizeof(tests[0]);
+
+    int successful_tests = 0;
+
+    for (int i = 0; i < total_tests; i++) {
+        if (run_test(&tests[i]) == 0) {
+            successful_tests++;
+        }
+    }
+
+    printf("\n========================================\n");
+    printf("RESUMEN DE PRUEBAS\n");
+    printf("========================================\n");
+    printf(
+        "Pruebas exitosas: %d/%d\n",
+        successful_tests,
+        total_tests
+    );
+
+    if (successful_tests == total_tests) {
+        printf("TODAS LAS PRUEBAS PASARON.\n");
+        return 0;
+    }
+
+    printf("ALGUNAS PRUEBAS FALLARON.\n");
+
+    return 1;
 }
