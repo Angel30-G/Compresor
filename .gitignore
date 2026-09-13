@@ -10,13 +10,11 @@ bin/*
 # Mantener carpeta bin
 !bin/.gitkeep
 
-# Datos de prueba
-data/originales/*
+# Archivos generados
 data/comprimidos/*
 data/descomprimidos/*
 
 # Mantener directorios
-!data/originales/.gitkeep
 !data/comprimidos/.gitkeep
 !data/descomprimidos/.gitkeep
 
