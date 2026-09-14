@@ -31,3 +31,4 @@ El archivo comprimido contiene:
 ```bash
 make clean
 make
+./bin/gui
