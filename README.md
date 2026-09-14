@@ -29,6 +29,8 @@ El archivo comprimido contiene:
 ## Compilar
 
 ```bash
+sudo apt update
+sudo apt install build-essential libssl-dev libgtk-3-dev pkg-config
 make clean
 make
 ./bin/gui
