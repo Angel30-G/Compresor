@@ -1,9 +1,9 @@
+cat > src/gui.c << 'GUI_EOF'
 #include <gtk/gtk.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <locale.h>
 
 /* ==================== Estructuras ==================== */
 typedef struct {
@@ -144,7 +144,7 @@ static void on_seleccionar_directorio(GtkWidget *widget, gpointer data) {
 static void on_comprimir_serial(GtkWidget *widget, gpointer data) {
     if (!directorio_seleccionado) { g_print("Seleccione un directorio primero.\n"); return; }
     char comando[2048];
-    snprintf(comando, sizeof(comando), "bin/compresor_serial c \"%s\" data/comprimidos", directorio_seleccionado);
+    snprintf(comando, sizeof(comando), "bin/compresor_serial c \"%s\" /tmp/salida_comprimida", directorio_seleccionado);
     char salida[8192] = {0};
     if (ejecutar_comando(comando, salida, sizeof(salida))) {
         Stats stats = {0};
@@ -159,7 +159,7 @@ static void on_comprimir_serial(GtkWidget *widget, gpointer data) {
 static void on_comprimir_parallel(GtkWidget *widget, gpointer data) {
     if (!directorio_seleccionado) { g_print("Seleccione un directorio primero.\n"); return; }
     char comando[2048];
-    snprintf(comando, sizeof(comando), "bin/compresor_parallel \"%s\" data/comprimidos_par", directorio_seleccionado);
+    snprintf(comando, sizeof(comando), "bin/compresor_parallel \"%s\" /tmp/salida_comprimida_par", directorio_seleccionado);
     char salida[8192] = {0};
     if (ejecutar_comando(comando, salida, sizeof(salida))) {
         Stats stats = {0};
@@ -174,7 +174,7 @@ static void on_comprimir_parallel(GtkWidget *widget, gpointer data) {
 static void on_comprimir_concurrent(GtkWidget *widget, gpointer data) {
     if (!directorio_seleccionado) { g_print("Seleccione un directorio primero.\n"); return; }
     char comando[2048];
-    snprintf(comando, sizeof(comando), "bin/compresor_concurrent \"%s\" data/comprimidos_conc", directorio_seleccionado);
+    snprintf(comando, sizeof(comando), "bin/compresor_concurrent \"%s\" /tmp/salida_comprimida_conc", directorio_seleccionado);
     char salida[8192] = {0};
     if (ejecutar_comando(comando, salida, sizeof(salida))) {
         Stats stats = {0};
@@ -188,7 +188,7 @@ static void on_comprimir_concurrent(GtkWidget *widget, gpointer data) {
 
 static void on_descomprimir_serial(GtkWidget *widget, gpointer data) {
     char comando[2048];
-    snprintf(comando, sizeof(comando), "bin/compresor_serial d data/comprimidos data/descomprimidos");
+    snprintf(comando, sizeof(comando), "bin/descompresor_serial /tmp/salida_comprimida /tmp/salida_descomprimida_serial");
     char salida[8192] = {0};
     if (ejecutar_comando(comando, salida, sizeof(salida))) {
         Stats stats = {0};
@@ -202,7 +202,7 @@ static void on_descomprimir_serial(GtkWidget *widget, gpointer data) {
 
 static void on_descomprimir_parallel(GtkWidget *widget, gpointer data) {
     char comando[2048];
-    snprintf(comando, sizeof(comando), "bin/descompresor_parallel data/comprimidos_par /tmp/salida_descomprimida_par");
+    snprintf(comando, sizeof(comando), "bin/descompresor_parallel /tmp/salida_comprimida_par /tmp/salida_descomprimida_par");
     char salida[8192] = {0};
     if (ejecutar_comando(comando, salida, sizeof(salida))) {
         Stats stats = {0};
@@ -216,7 +216,7 @@ static void on_descomprimir_parallel(GtkWidget *widget, gpointer data) {
 
 static void on_descomprimir_concurrent(GtkWidget *widget, gpointer data) {
     char comando[2048];
-    snprintf(comando, sizeof(comando), "bin/descompresor_concurrent data/comprimidos_conc /tmp/salida_descomprimida_conc");
+    snprintf(comando, sizeof(comando), "bin/descompresor_concurrent /tmp/salida_comprimida_conc /tmp/salida_descomprimida_conc");
     char salida[8192] = {0};
     if (ejecutar_comando(comando, salida, sizeof(salida))) {
         Stats stats = {0};
@@ -302,10 +302,10 @@ static void construir_interfaz(GtkApplication *app, gpointer user_data) {
 
 /* ==================== main ==================== */
 int main(int argc, char *argv[]) {
-    setlocale(LC_NUMERIC, "C");
     GtkApplication *app = gtk_application_new("org.ejemplo.compresor", G_APPLICATION_DEFAULT_FLAGS);
     g_signal_connect(app, "activate", G_CALLBACK(construir_interfaz), NULL);
     int status = g_application_run(G_APPLICATION(app), argc, argv);
     g_object_unref(app);
     return status;
 }
+GUI_EOF
