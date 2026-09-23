@@ -310,7 +310,7 @@ static void on_comprimir_serial(
         directorio_seleccionado
     );
 
-    char salida[8192] = {0};
+    char salida[65536] = {0};
 
     if (
         ejecutar_comando(
@@ -366,7 +366,7 @@ static void on_comprimir_parallel(
         directorio_seleccionado
     );
 
-    char salida[8192] = {0};
+    char salida[65536] = {0};
 
     if (
         ejecutar_comando(
@@ -431,7 +431,7 @@ static void on_comprimir_concurrent(
         directorio_seleccionado
     );
 
-    char salida[8192] = {0};
+    char salida[65536] = {0};
 
     if (
         ejecutar_comando(
@@ -488,7 +488,7 @@ static void on_descomprimir_serial(
         "bin/compresor_serial d data/comprimidos data/descomprimidos"
     );
 
-    char salida[8192] = {0};
+    char salida[65536] = {0};
 
     if (
         ejecutar_comando(
@@ -536,7 +536,7 @@ static void on_descomprimir_parallel(
         "bin/compresor_parallel d data/comprimidos_par data/descomprimidos_par"
     );
 
-    char salida[8192] = {0};
+    char salida[65536] = {0};
 
     if (
         ejecutar_comando(
@@ -593,7 +593,7 @@ static void on_descomprimir_concurrent(
         "bin/compresor_concurrent d data/comprimidos_conc data/descomprimidos_conc"
     );
 
-    char salida[8192] = {0};
+    char salida[65536] = {0};
 
     if (
         ejecutar_comando(
